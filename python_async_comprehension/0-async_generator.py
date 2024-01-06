@@ -1,17 +1,12 @@
 #!/usr/bin/env python3
-"""
-this module create an async generator
-"""
-
-
+''' Async generator '''
 import random
 import asyncio
+from typing import Generator
 
 
-async def async_generator():
-    """ coroutine will loop 10 times, each time asynchronously
-    wait 1 second, then yield a random number between 0 and 10"""
-    for loop in range(10):
-        nb = random.uniform(0, 10)
+async def async_generator() -> Generator[float, None, None]:
+    ''' Function that return a list '''
+    for i in range(10):
         await asyncio.sleep(1)
-        yield nb
+        yield random.uniform(0, 10)
