@@ -1,23 +1,8 @@
 #!/usr/bin/env python3
-'''Description: Implement a method named get_page that takes two integer
-                arguments page with default value 1 and page_size with
-                default value 10.
-
-    - You have to use this CSV file (same as the one presented at the top
-      of the project)
-    - Use assert to verify that both arguments are integers greater than 0.
-    - Use index_range to find the correct indexes to paginate the dataset
-      correctly and return the appropriate page of the dataset (i.e. the
-    correct list of rows).
-    - If the input arguments are out of range for the dataset, an empty list
-      should be returned.
-'''
-
+''' Simple pagination '''
 import csv
 import math
-from typing import List
-
-index_range = __import__('0-simple_helper_function').index_range
+from typing import List, Tuple
 
 
 class Server:
@@ -26,7 +11,6 @@ class Server:
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
-        ''' Initialize instance. '''
         self.__dataset = None
 
     def dataset(self) -> List[List]:
@@ -41,15 +25,20 @@ class Server:
         return self.__dataset
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        ''' Return page of dataset. '''
-        assert isinstance(page, int) and isinstance(page_size, int)
-        assert page > 0 and page_size > 0
-
-        indices = index_range(page, page_size)
-        start = indices[0]
-        end = indices[1]
-
-        try:
-            return self.dataset()[start:end]
-        except IndexError:
+        ''' def get page '''
+        assert type(page_size) is int and type(page) is int
+        assert page > 0
+        assert page_size > 0
+        self.dataset()
+        i = index_range(page, page_size)
+        if i[0] >= len(self.__dataset):
             return []
+        else:
+            return self.__dataset[i[0]:i[1]]
+
+
+def index_range(page: int, page_size: int) -> Tuple[int, int]:
+    ''' De*f index range '''
+    index = page * page_size - page_size
+    index_1 = index + page_size
+    return (index, index_1)

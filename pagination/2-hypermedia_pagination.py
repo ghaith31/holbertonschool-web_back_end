@@ -1,23 +1,8 @@
 #!/usr/bin/env python3
-''' Description: Implement a get_hyper method that takes the same arguments
-                 (and defaults) as get_page and returns a dictionary containing
-                 the following key-value pairs:
-
-        - page_size: the length of the returned dataset page
-        - page: the current page number
-        - data: the dataset page (equivalent to return from previous task)
-        - next_page: number of the next page, None if no next page
-        - prev_page: number of the previous page, None if no previous page
-        -total_pages: the total number of pages in the dataset as an integer
-    Make sure to reuse get_page in your implementation.
-    You can use the math module if necessary.
-'''
-
+''' Hypermedia pagination '''
 import csv
-from math import ceil
-from typing import List
-
-index_range = __import__('0-simple_helper_function').index_range
+import math
+from typing import Dict, List, Tuple
 
 
 class Server:
@@ -26,7 +11,6 @@ class Server:
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
-        ''' Initialize instance. '''
         self.__dataset = None
 
     def dataset(self) -> List[List]:
@@ -41,37 +25,36 @@ class Server:
         return self.__dataset
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        ''' Return page of dataset. '''
-        assert isinstance(page, int) and isinstance(page_size, int)
-        assert page > 0 and page_size > 0
-
-        indices = index_range(page, page_size)
-        start = indices[0]
-        end = indices[1]
-
-        try:
-            return self.dataset()[start:end]
-        except IndexError:
+        ''' def get page '''
+        assert type(page_size) is int and type(page) is int
+        assert page > 0
+        assert page_size > 0
+        self.dataset()
+        i = index_range(page, page_size)
+        if i[0] >= len(self.__dataset):
             return []
+        else:
+            return self.__dataset[i[0]:i[1]]
 
-    def get_hyper(self, page: int = 1, page_size: int = 10) -> dict:
-        ''' Return dict of pagination data.
-            Dict key/value pairs consist of the following:
-                page_size - length of dataset page
-                page - current page number
-                data - dataset page
-                next_page - number of next page if there is one
-                prev_page - number of previous page if there is one
-                total_pages - total number of pages '''
-        page_data = self.get_page(page, page_size)
-        total_data = len(self.dataset())
-        total_pages = ceil(total_data / page_size)
+    def get_hyper(self, page: int = 1, page_size: int = 10) -> Dict:
+        ''' Def get hyper '''
+        dataset_items = len(self.dataset())
+        data = self.get_page(page, page_size)
+        total_pages = math.ceil(dataset_items / page_size)
 
-        return {
-            'page_size': len(page_data),
-            'page': page,
-            'data': page_data,
-            'next_page': page + 1 if page < total_pages else None,
-            'prev_page': page - 1 if page != 1 else None,
-            'total_pages': total_pages
-        }
+        p = {
+            "page": page,
+            "page_size": page_size if page < total_pages else 0,
+            "data": data,
+            "next_page": page + 1 if page + 1 < total_pages else None,
+            "prev_page": page - 1 if page - 1 > 0 else None,
+            "total_pages": total_pages
+            }
+        return p
+
+
+def index_range(page: int, page_size: int) -> Tuple[int, int]:
+    ''' Def index range '''
+    index = page * page_size - page_size
+    index_1 = index + page_size
+    return (index, index_1)
